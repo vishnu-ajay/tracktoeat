@@ -48,7 +48,7 @@ class _HomeState extends State<Home> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.star),
+                icon: const Icon(Icons.menu),
                 color: selectedPage == 1 ? LightTheme.deepIndigoAccent : Colors
                     .grey,
                 onPressed: () {

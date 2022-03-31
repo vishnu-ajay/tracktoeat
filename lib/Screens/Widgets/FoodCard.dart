@@ -17,15 +17,15 @@ class FoodCard extends StatelessWidget {
       child: Card(
         child: SizedBox(
           height: 120,
-          width: 250,
+          width: 300,
           child: Row(
             children:[
             SizedBox(
             height: 75,width: 75,
                 child: Image.asset('assets/burger.jpg',height: 75,width: 75,fit: BoxFit.fill,)),
-              const SizedBox(width: 40,),
+              const SizedBox(width: 30,),
               SizedBox(
-                width: 150,
+                width: 140,
                 child: Column(
                   children: [
                     const SizedBox(height: 15,),
@@ -67,15 +67,16 @@ class FoodCard extends StatelessWidget {
                 child: Container(
                   height: 50,
                     width: 70,
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Text('$price/-',
-                      style: TextStyle(
-                          color: lightTheme.value
-                              ? LightTheme.darkGray
-                              : Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15
-                      ),)),
+                    child: Center(
+                      child: Text('$price/-',
+                        style: TextStyle(
+                            color: lightTheme.value
+                                ? LightTheme.darkGray
+                                : Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13
+                        ),),
+                    )),
               ),
           ],
           ),
