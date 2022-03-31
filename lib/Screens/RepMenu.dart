@@ -65,7 +65,7 @@ class _RepMenuState extends State<RepMenu> {
                                 const SizedBox(
                                   height: 30,
                                   child: Text(
-                                    'Choose the Day',
+                                    'Chosen Day',
                                     style: TextStyle(
                                       color: LightTheme.gray,
                                       fontSize: 13,
@@ -103,7 +103,7 @@ class _RepMenuState extends State<RepMenu> {
                                 const SizedBox(
                                   height: 30,
                                   child: Text(
-                                    'Choose the Meal',
+                                    'Chosen Meal',
                                     style: TextStyle(
                                       color: LightTheme.gray,
                                       fontSize: 13,

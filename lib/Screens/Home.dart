@@ -32,8 +32,8 @@ class _HomeState extends State<Home> {
     }
 
     return const[
-      // RepMenu(),
-      HomeMenu(),
+       RepMenu(),
+      // HomeMenu(),
       AllMenu(),
     ];
   }
