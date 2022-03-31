@@ -14,22 +14,7 @@ class AllMenu extends StatefulWidget {
 class _AllMenuState extends State<AllMenu> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Track2Eat'),
-            backgroundColor: LightTheme.deepIndigoAccent,
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.logout,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          body: CustomScrollView(
+    return CustomScrollView(
             slivers: [
               const SliverPadding(
                 padding: EdgeInsets.only(top: 30, bottom: 5),
@@ -104,7 +89,6 @@ class _AllMenuState extends State<AllMenu> {
                 ),
               ),
             ],
-          ),
-        ));
+          );
   }
 }

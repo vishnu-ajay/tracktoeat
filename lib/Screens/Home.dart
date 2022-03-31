@@ -21,11 +21,25 @@ class _HomeState extends State<Home> {
   final PageController _pageController = PageController(initialPage: 0);
   int selectedPage = 0;
 
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
+      appBar: AppBar(
+        title: const Text('Track2Eat'),
+        backgroundColor: LightTheme.deepIndigoAccent,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
         body: PageView(
-          physics: const NeverScrollableScrollPhysics(),
+          scrollDirection: Axis.horizontal,
           controller: _pageController,
           children: const [
             HomeMenu(),
@@ -41,7 +55,7 @@ class _HomeState extends State<Home> {
                 color: selectedPage == 0 ? LightTheme.deepIndigoAccent : Colors
                     .grey,
                 onPressed: () {
-                  _pageController.animateToPage(0, curve: Curves.easeIn, duration: const Duration(milliseconds: 300));
+                  _pageController.animateToPage(0, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
                   setState(() {
                     selectedPage = 0;
                   });
@@ -52,7 +66,7 @@ class _HomeState extends State<Home> {
                 color: selectedPage == 1 ? LightTheme.deepIndigoAccent : Colors
                     .grey,
                 onPressed: () {
-                  _pageController.animateToPage(1, curve: Curves.easeIn, duration: const Duration(milliseconds: 300));
+                  _pageController.animateToPage(1, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
                   setState(() {
                     selectedPage = 1;
                   });

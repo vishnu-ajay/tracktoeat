@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "382172171683-404d7d6vb803ocv3ktaf6ua57di2cdhh.apps.googleusercontent.com",
+          "client_id": "382172171683-tkinaipbuikl1r993606shvb8b3jfomk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.tracktoeat.tracktoeat",
-            "certificate_hash": "87f948b7ac60c7efd5b14b9b52ee544aab1f053a"
+            "certificate_hash": "e7d58bc05deff155529032ff41b21f363cf9b91f"
           }
         },
         {

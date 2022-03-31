@@ -169,7 +169,7 @@ class _MenuEditFiltersState extends State<MenuEditFilters> {
                                 child: Center(
                                   child: DropdownButton<String>(
                                     value: dropdownValue,
-                                    dropdownColor: LightTheme.deepIndigoAccent,
+                                    dropdownColor: LightTheme.deepIndigoAccent  ,
                                     icon: const Icon(Icons.keyboard_arrow_down,color: LightTheme.white,),
                                     elevation: 16,
                                     style: const TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.w400),
