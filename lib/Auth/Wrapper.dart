@@ -28,7 +28,7 @@ class _WrapperState extends State<Wrapper> {
       stream: AuthService().user,
       builder: (context, user){
         if(user.hasData) {
-          return Home();//return Home(authUser: AuthUser(user:user.data as User,role:"",error:""));
+          return Home(authUser: AuthUser(user:user.data as User,role:"",error:""));
         }
         else {
             return Login(toggleView: toggleView);

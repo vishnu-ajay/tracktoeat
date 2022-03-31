@@ -8,10 +8,11 @@ import 'package:tracktoeat/Theme.dart';
 
 import '../Globals.dart';
 import 'HomeMenu.dart';
+import 'RepMenu.dart';
 
 class Home extends StatefulWidget {
-  // final AuthUser authUser;
-  const Home({Key? key}) : super(key: key);
+  final AuthUser authUser;
+  const Home({Key? key, required this.authUser}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -21,6 +22,21 @@ class _HomeState extends State<Home> {
   final PageController _pageController = PageController(initialPage: 0);
   int selectedPage = 0;
 
+  List<Widget> getMenuBar(){
+    if(widget.authUser.role==messRep) {
+      return const [
+        HomeMenu(),
+        AllMenu(),
+        // RepMenu(),
+      ];
+    }
+
+    return const[
+      // RepMenu(),
+      HomeMenu(),
+      AllMenu(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +57,7 @@ class _HomeState extends State<Home> {
         body: PageView(
           scrollDirection: Axis.horizontal,
           controller: _pageController,
-          children: const [
-            HomeMenu(),
-            AllMenu(),
-          ],
+          children: getMenuBar(),
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
