@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../Auth/User.dart';
 
 class Database{
@@ -20,9 +23,24 @@ class Database{
     });
   }
 
-  Future<User> getUser()async{
-    Map<String,dynamic> result = (await userCollection.doc(uid).get()).data() as Map<String,dynamic>;
-    return User(email: result['email'],role: result['role']);
+  Future<User> getUser()async {
+    Map<String, dynamic> result = (await userCollection.doc(uid).get())
+        .data() as Map<String, dynamic>;
+    return User(email: result['email'], role: result['role']);
+  }
+
+  static Future<String> uploadImage(Uint8List fileBytes, String fileType)async{
+    try {
+      print(FirebaseStorage.instance.ref().child('images/${DateTime.now().microsecondsSinceEpoch}.$fileType').fullPath);
+      print('^'*50);
+      TaskSnapshot snapshot = await FirebaseStorage.instance.ref().child('images/${DateTime.now().microsecondsSinceEpoch}.$fileType').putData(fileBytes);
+      return snapshot.ref.getDownloadURL();
+    }catch(e){
+      print(e.toString());
+      print('*'*50);
+    }
+
+    return "-1";
   }
 
 }
