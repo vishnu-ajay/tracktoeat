@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tracktoeat/Auth/AuthUser.dart';
 
 import '../Auth/Auth.dart';
 import '../Globals.dart';
@@ -102,7 +103,7 @@ class _LoginState extends State<Login> {
                           setState(() {
                             showLoading = true;
                           });
-                          var res = await _auth.loginWithGoogle();
+                          AuthUser res = await _auth.loginWithGoogle();
                           setState(() {
                             showLoading  = false;
                           });

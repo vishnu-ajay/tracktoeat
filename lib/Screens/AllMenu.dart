@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tracktoeat/Database/SearchFilter.dart';
 
 import '../Theme.dart';
 import 'MenuEditFilters.dart';
@@ -39,8 +40,8 @@ class _AllMenuState extends State<AllMenu> {
                       child: ClipRRect(
                         borderRadius: const BorderRadius.all(Radius.circular(10)),
                         child: GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context){
+                          onTap: ()async{
+                           SearchFilter searchFilter = await Navigator.push(context, MaterialPageRoute(builder: (context){
                               return const MenuEditFilters();
                             },),);
                           },

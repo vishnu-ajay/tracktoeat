@@ -23,14 +23,9 @@ class AuthService{
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      print(googleUser);
-      print('_'*30);
-
       if(googleUser == null) {
         throw "GoogleUser is Null!";
       }
-
-      print('hello there'*30);
 
       final GoogleSignInAuthentication googleAuth = await googleUser
           .authentication;
@@ -50,10 +45,10 @@ class AuthService{
       User _user = result.user!;
       String role = primaryUser;
       String _uid = _user.uid;
-      bool alreadyRegistered = await Database(uid: _uid).alreadyRegistered();
-      print('Already Registered User!');
+      bool alreadyRegistered = await Database.alreadyRegistered(_user.email??"");
       if(alreadyRegistered) {
-        role = (await Database(uid: _uid).getUser()).role;
+        print('Already Registered User!');
+        role = (await Database.getUser(_user.email??"")).role;
       }
       else {
         if(_user.email==null){
@@ -76,6 +71,8 @@ class AuthService{
 
   // Logout
   Future<void> logout()async {
-    return await _auth.signOut();
+    await _auth.signOut();
+    GoogleSignIn _googleSignIn = GoogleSignIn();
+    await _googleSignIn.disconnect();
   }
 }

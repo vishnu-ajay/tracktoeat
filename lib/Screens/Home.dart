@@ -1,14 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:tracktoeat/Auth/Auth.dart';
 import 'package:tracktoeat/Auth/AuthUser.dart';
 import 'package:tracktoeat/Screens/AllMenu.dart';
+import 'package:tracktoeat/Screens/Login.dart';
 import 'package:tracktoeat/Screens/Widgets/FoodCard.dart';
 import 'package:tracktoeat/Theme.dart';
 
+
+import '../Auth/Wrapper.dart';
+import '../Database/Database.dart';
 import '../Globals.dart';
 import 'HomeMenu.dart';
+import 'Loading.dart';
 import 'RepMenu.dart';
+import 'SuperAdminHome.dart';
 
 class Home extends StatefulWidget {
   final AuthUser authUser;
@@ -21,32 +29,57 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final PageController _pageController = PageController(initialPage: 0);
   int selectedPage = 0;
+  String userRole = primaryUser;
+  bool loading = true;
+
+  @override
+  void initState(){
+    firebaseAuth.User? user = widget.authUser.user;
+    Database.getUserRole(user == null ? "" : (user.email??"")).then((value){
+      widget.authUser.role = value;
+      userRole = value;
+      setState(() {
+        loading = false;
+      });
+    });
+    super.initState();
+  }
 
   List<Widget> getMenuBar(){
-    if(widget.authUser.role==messRep) {
+    if(userRole==messRep) {
       return const [
         HomeMenu(),
         AllMenu(),
-        // RepMenu(),
+        RepMenu(),
       ];
     }
 
     return const[
-       RepMenu(),
-      // HomeMenu(),
+      HomeMenu(),
       AllMenu(),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    if(loading) {
+      return Loading();
+    }
+
+    if(userRole==superAdmin){
+      return const SuperAdminHome();
+    }
+
     return SafeArea(child: Scaffold(
       appBar: AppBar(
         title: const Text('Track2Eat'),
         backgroundColor: LightTheme.deepIndigoAccent,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              AuthService().logout();
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){return const Wrapper();}));
+            },
             icon: const Icon(
               Icons.logout,
               color: Colors.white,
@@ -85,6 +118,19 @@ class _HomeState extends State<Home> {
                   });
                 },
               ),
+
+              if(userRole == messRep)
+                IconButton(
+                  icon: const Icon(Icons.more_horiz),
+                  color: selectedPage == 2 ? LightTheme.deepIndigoAccent : Colors
+                      .grey,
+                  onPressed: () {
+                    _pageController.animateToPage(2, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
+                    setState(() {
+                      selectedPage = 2;
+                    });
+                  },
+                ),
             ],
           ),
         )
