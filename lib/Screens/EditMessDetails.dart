@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tracktoeat/Database/MessDetails.dart';
 
@@ -8,21 +7,42 @@ import '../Auth/Auth.dart';
 import '../Database/Database.dart';
 import '../Theme.dart';
 
-class AddMess extends StatefulWidget {
-  const AddMess({Key? key}) : super(key: key);
+class EditMessDetails extends StatefulWidget {
+  final String messName;
+  const EditMessDetails({Key? key,required this.messName}) : super(key: key);
 
   @override
-  State<AddMess> createState() => _AddMessState();
+  State<EditMessDetails> createState() => _EditMessDetailsState();
 }
 
-class _AddMessState extends State<AddMess> {
+class _EditMessDetailsState extends State<EditMessDetails> {
   final _formKey = GlobalKey<FormState>();
-  String nameOfMess = "";
-  String messRepName = "";
-  String messRepEmail = "";
-  String messLocation = "";
-  String managerPhoneNo = "";
-  bool loading = false;
+  MessDetails originalDetails = MessDetails(nameOfMess: "", messRepEmail:"", messRepName: "", messLocation: "", managerPhoneNo: "");
+  MessDetails messDetails = MessDetails(nameOfMess: "", messRepEmail:"", messRepName: "", messLocation: "", managerPhoneNo: "");
+  final _messNameController = TextEditingController(text: "");
+  final _messRepNameController = TextEditingController(text: "");
+  final _messRepEmailController = TextEditingController(text: "");
+  final _messLocationController = TextEditingController(text: "");
+  final _messManagerPhoneController = TextEditingController(text: "");
+
+  bool loading = true;
+
+  @override
+  void initState() {
+    Database.getMessDetails(widget.messName).then((value){
+      setState(() {
+        originalDetails = value;
+        _messRepNameController.text = value.messRepName;
+        _messLocationController.text = value.messLocation;
+        _messManagerPhoneController.text = value.managerPhoneNo;
+        _messNameController.text = value.nameOfMess;
+        _messRepEmailController.text = value.messRepEmail;
+        messDetails = MessDetails(nameOfMess: value.nameOfMess, messRepEmail: value.messRepEmail, messRepName: value.messRepName, messLocation: value.messLocation, managerPhoneNo: value.managerPhoneNo);
+        loading = false;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +88,8 @@ class _AddMessState extends State<AddMess> {
                             SizedBox(
                               height: 70,
                               child: TextFormField(
+                                controller: _messNameController,
                                 onChanged: (value) {
-                                  setState(() {
-                                    nameOfMess = value;
-                                  });
                                 },
                                 validator: (val) {
                                   if (val != null && val.isNotEmpty) {
@@ -106,6 +124,13 @@ class _AddMessState extends State<AddMess> {
                                       width: 1.0,
                                     ),
                                   ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors.grey,
+                                      width: 1.0,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -129,15 +154,16 @@ class _AddMessState extends State<AddMess> {
                                 'Mess Representative name',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
-                                  fontSize: 15,fontWeight: FontWeight.w500),
+                                    fontSize: 15,fontWeight: FontWeight.w500),
                               ),
                             ),
                             SizedBox(
                               height: 70,
                               child: TextFormField(
+                                controller: _messRepNameController,
                                 onChanged: (value) {
                                   setState(() {
-                                    messRepName = value;
+                                    messDetails.messRepName = value;
                                   });
                                 },
                                 validator: (val) {
@@ -202,9 +228,10 @@ class _AddMessState extends State<AddMess> {
                             SizedBox(
                               height: 70,
                               child: TextFormField(
+                                controller: _messRepEmailController,
                                 onChanged: (value) {
                                   setState(() {
-                                    messRepEmail = value;
+                                    messDetails.messRepEmail = value;
                                   });
                                 },
                                 validator: (val) {
@@ -269,9 +296,10 @@ class _AddMessState extends State<AddMess> {
                             SizedBox(
                               height: 70,
                               child: TextFormField(
+                                controller: _messLocationController,
                                 onChanged: (value) {
                                   setState(() {
-                                    messLocation = value;
+                                    messDetails.messLocation = value;
                                   });
                                 },
                                 validator: (val) {
@@ -336,9 +364,10 @@ class _AddMessState extends State<AddMess> {
                             SizedBox(
                               height: 70,
                               child: TextFormField(
+                                controller: _messManagerPhoneController,
                                 onChanged: (value) {
                                   setState(() {
-                                    managerPhoneNo = value;
+                                    messDetails.managerPhoneNo = value;
                                   });
                                 },
                                 validator: (val) {
@@ -385,54 +414,56 @@ class _AddMessState extends State<AddMess> {
                   ),
                 ),
                 SliverPadding(padding: const EdgeInsets.only(top: 20,bottom: 10),
-                sliver:SliverToBoxAdapter(
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius:
-                      const BorderRadius.all(Radius.circular(5)),
-                      child: GestureDetector(
-                        onTap: ()async{
-                          if(_formKey.currentState==null){
-                            return;
-                          }
-                          if(!_formKey.currentState!.validate()){
-                            return;
-                          }
+                  sliver:SliverToBoxAdapter(
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius:
+                        const BorderRadius.all(Radius.circular(5)),
+                        child: GestureDetector(
+                          onTap: ()async{
+                            if(_formKey.currentState==null){
+                              return;
+                            }
+                            if(!_formKey.currentState!.validate()){
+                              return;
+                            }
 
-                          setState(() {
-                            loading = true;
-                          });
+                            setState(() {
+                              loading = true;
+                            });
+
+                            await Database.deleteMessDetails(originalDetails);
 
 
-                          await Database.addMess(MessDetails(nameOfMess: nameOfMess, messRepEmail: messRepEmail, messRepName: messRepName, messLocation: messLocation, managerPhoneNo: managerPhoneNo)).then((value){
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: LightTheme.deepIndigoAccent,content: Text('Added mess successfully!',style: TextStyle(color: LightTheme.white),)));
+                            await Database.addMess(messDetails).then((value){
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: LightTheme.deepIndigoAccent,content: Text('Updated mess successfully!',style: TextStyle(color: LightTheme.white),)));
 
-                          }).catchError((error){
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Failed to add mess!',style: TextStyle(color: LightTheme.white),)));
-                          });
+                            }).catchError((error){
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Failed to add mess!',style: TextStyle(color: LightTheme.white),)));
+                            });
 
-                          setState(() {
-                            loading = false;
-                          });
+                            setState(() {
+                              loading = false;
+                            });
 
                           },
-                        child: Container(
-                          height: 50,
-                          width: 150,
-                          color: LightTheme.deepIndigoAccent,
-                          child: const Center(
-                            child: Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                color: Colors.white,
+                          child: Container(
+                            height: 50,
+                            width: 150,
+                            color: LightTheme.deepIndigoAccent,
+                            child: const Center(
+                              child: Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),),
+                  ),),
               ],
             ),
             if (loading)

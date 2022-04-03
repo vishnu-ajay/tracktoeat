@@ -346,11 +346,7 @@ class _RepMenuState extends State<RepMenu> {
                                 setState(() {
                                   loading = true;
                                 });
-                                print(messName);
-                                print(_meals[_mealIndex]);
                                 _oFood = await Database.getFood(messName,_daysOfTheWeek[_dayIndex], _meals[_mealIndex]);
-                                print(_oFood?.toJson());
-                                print('@'*50);
                                 mealPrice = _oFood!.price;
                                 mealName = _oFood!.mealName;
                                 _textController.text = mealName;
@@ -603,8 +599,7 @@ class _RepMenuState extends State<RepMenu> {
                                     _uploadImage = File(image.path);
                                   });
                                 } else {
-                                  print(
-                                      'Permission not granted. Try Again with permission access');
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Permission not granted. Try Again with permission access',style: TextStyle(color: LightTheme.white),)));
                                   //TODO: Replace print statement with scaffold message.
                                 }
                               },

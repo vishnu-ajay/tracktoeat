@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:tracktoeat/Database/MessDetails.dart';
 import 'package:tracktoeat/Globals.dart';
 import '../Auth/User.dart';
 import 'Food.dart';
@@ -68,11 +69,11 @@ class Database{
   }
 
   static Future<List<User>> getMessRep()async{
-    List<QueryDocumentSnapshot> _list = (await userCollection.where('role', isEqualTo: messRep).get()).docs;
+    List<QueryDocumentSnapshot> _list = (await messRepMappingCollection.get()).docs;
     List<User>result = [];
 
     for(var l in _list){
-      result.add(User(email: l['email'],role: l['role']));
+      result.add(User(email: l.id,role: l['mess']));
     }
 
     return result;
@@ -116,5 +117,42 @@ class Database{
     return result['mess']??"";
   }
 
+  static Future<void> addMess(MessDetails messDetails)async{
+    messCollection.add(messDetails.toJson());
+
+    QuerySnapshot snapshot = await userCollection.where('email',isEqualTo: messDetails.messRepEmail).get();
+
+    if(snapshot.docs.isEmpty){
+      await userCollection.add({'email':messDetails.messRepEmail,'role':messRep});
+    }else{
+      await userCollection.doc(snapshot.docs.first.id).update({'role':messRep});
+    }
+
+    await messRepMappingCollection.doc(messDetails.messRepEmail).set({'mess':messDetails.nameOfMess});
+    
+    messCollection.doc('all-mess').update({'mess':FieldValue.arrayUnion([messDetails.nameOfMess])});
+  }
+
+  static Future<MessDetails> getMessDetails(String messName)async{
+     List<QueryDocumentSnapshot> snapshots = (await messCollection.where('nameOfMess', isEqualTo: messName).get()).docs;
+
+     return MessDetails.fromJson(snapshots.first.data() as Map<String,dynamic>);
+  }
+
+  static Future<void> deleteMessDetails(MessDetails messDetails)async {
+    List<QueryDocumentSnapshot> _snapshots = (await messCollection.where('nameOfMess',isEqualTo: messDetails.nameOfMess).get()).docs;
+
+    for(var snapshot in _snapshots){
+      await snapshot.reference.delete();
+    }
+
+    QuerySnapshot userSnapshot = await userCollection.where('email',isEqualTo: messDetails.messRepEmail).get();
+
+    await userCollection.doc(userSnapshot.docs.first.id).update({'role':primaryUser});
+
+    await messRepMappingCollection.doc(messDetails.messRepEmail).delete();
+
+    messCollection.doc('all-mess').update({'mess':FieldValue.arrayRemove([messDetails.nameOfMess])});
+  }
 
 }
