@@ -54,6 +54,7 @@ dependencies:
   firebase_storage: ^10.2.10
   image_picker: ^0.8.4+11
   permission_handler: ^9.2.0
+  shared_preferences: ^2.0.13
 
 
 

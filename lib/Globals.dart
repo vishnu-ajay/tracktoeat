@@ -5,3 +5,5 @@ const String primaryUser = "PRIMARY_USER";
 const String messRep = "MESS_REP";
 
 final ValueNotifier<bool>lightTheme = ValueNotifier<bool>(true);
+
+int foodRating = 0;

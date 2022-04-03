@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../Auth/AuthUser.dart';
 import '../Database/Database.dart';
 import '../Database/Food.dart';
 import '../Theme.dart';
@@ -11,7 +12,8 @@ import 'package:image_picker/image_picker.dart';
 import 'Widgets/FoodCard.dart';
 
 class RepMenu extends StatefulWidget {
-  const RepMenu({Key? key}) : super(key: key);
+  final AuthUser authUser;
+  const RepMenu({Key? key,required this.authUser}) : super(key: key);
 
   @override
   State<RepMenu> createState() => _RepMenuState();
@@ -32,10 +34,10 @@ class _RepMenuState extends State<RepMenu> {
   final _textController = TextEditingController(text: "");
   final _priceController = TextEditingController(text: "");
   final ImagePicker _picker = ImagePicker();
-  String messName = "None";
+  String messName = "";
   int _mealIndex = 0;
   int _dayIndex = 0;
-  String mealName = "";
+  String mealName = "Snacks";
   double mealPrice = 0.0;
   File? _uploadImage;
 
@@ -45,16 +47,31 @@ class _RepMenuState extends State<RepMenu> {
 
   bool loading = false;
 
+  @override
+  void initState() {
+    setState(() {
+      loading = true;
+    });
+    Database.getMyMess(widget.authUser.user!.email??"").then((value){
+      setState(() {
+        messName = value;
+        loading = false;
+      });
+    });
+    super.initState();
+  }
+
   void clearAll(){
     applyFilters = true;
-    _mealIndex = 0;
+    _uploadImage = null;
+    // _mealIndex = 0;
     _oFood = null;
-    _dayIndex = 0;
+    _oFood = null;
+    // _dayIndex = 0;
     mealName = "";
     mealPrice = 0;
     _textController.text = "";
     _priceController.text = "";
-    messName = 'None';
   }
 
   @override
@@ -207,28 +224,12 @@ class _RepMenuState extends State<RepMenu> {
                                 width: 200,
                                 color: LightTheme.deepIndigoAccent,
                                 child: Center(
-                                  child: DropdownButton<String>(
-                                    value: messName,
-                                    dropdownColor: LightTheme.deepIndigoAccent  ,
-                                    icon: const Icon(Icons.keyboard_arrow_down,color: LightTheme.white,),
-                                    elevation: 16,
-                                    style: const TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.w400),
-                                    underline: Container(
-                                      height: 0,
-                                    ),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        messName = newValue!;
-                                        applyFilters = true;
-                                      });
-                                    },
-                                    items: <String>['None','A-mess', 'B-mess', 'C-mess', 'D-mess','E-mess','F-mess','G-mess']
-                                        .map<DropdownMenuItem<String>>((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
+                                  child: Text(
+                                    messName,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
                                   ),
                                 ),
                               ),
@@ -331,6 +332,55 @@ class _RepMenuState extends State<RepMenu> {
                                   icon: const Icon(Icons.keyboard_arrow_right)),
                               const Spacer(),
                             ],
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.only(
+                          top: 20,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: ()async{
+                                setState(() {
+                                  loading = true;
+                                });
+                                print(messName);
+                                print(_meals[_mealIndex]);
+                                _oFood = await Database.getFood(messName,_daysOfTheWeek[_dayIndex], _meals[_mealIndex]);
+                                print(_oFood?.toJson());
+                                print('@'*50);
+                                mealPrice = _oFood!.price;
+                                mealName = _oFood!.mealName;
+                                _textController.text = mealName;
+                                _priceController.text = mealPrice.toString();
+                                setState(() {
+                                  loading = false;
+                                  applyFilters = false;
+                                });
+
+                                return;
+                              },
+                              child: Container(
+                                height: 40,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                    borderRadius:
+                                    const BorderRadius.all(Radius.circular(5)),
+                                  color: applyFilters ? LightTheme.deepIndigoAccent : Colors.black12,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Apply Filters',
+                                    style: TextStyle(
+                                        color: applyFilters ? Colors.white : Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -471,6 +521,33 @@ class _RepMenuState extends State<RepMenu> {
                           ),
                         ),
                       ),
+                      if((!applyFilters) && (_oFood!=null) && (_oFood!.imageUrl!=""))
+                        SliverPadding(
+                          padding: const EdgeInsets.only(top: 20),
+                          sliver: SliverToBoxAdapter(
+                            child: Center(
+                              child: ClipRRect(
+                                child: Container(
+                                  height: 300,
+                                  width: 300,
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      border: Border.all(
+                                        color: LightTheme.deepIndigoAccent,
+                                      )),
+                                  child: Image(
+                                    image: Image.network(
+                                      _oFood!.imageUrl,
+                                      fit: BoxFit.fill,
+                                    ).image,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       if (_uploadImage != null)
                         SliverPadding(
                           padding: const EdgeInsets.only(top: 20),
@@ -520,6 +597,9 @@ class _RepMenuState extends State<RepMenu> {
                                   }
 
                                   setState(() {
+                                    if(_oFood!=null){
+                                      _oFood!.imageUrl = "";
+                                    }
                                     _uploadImage = File(image.path);
                                   });
                                 } else {
@@ -604,20 +684,7 @@ class _RepMenuState extends State<RepMenu> {
                                 onTap: () async {
 
                                   if(applyFilters){
-                                      setState(() {
-                                        loading = true;
-                                      });
-
-                                      _oFood = await Database.getFood(messName, _meals[_mealIndex]);
-                                      mealPrice = _oFood!.price;
-                                      mealName = _oFood!.mealName;
-                                      messName = _oFood!.mess;
-                                      _textController.text = mealName;
-                                      _priceController.text = mealPrice.toString();
-                                      setState(() {
-                                        loading = false;
-                                        applyFilters = false;
-                                      });
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Apply filters before saving!',style: TextStyle(color: LightTheme.white),)));
 
                                     return;
                                   }
@@ -635,7 +702,7 @@ class _RepMenuState extends State<RepMenu> {
                                       : await Database.uploadImage(
                                           _uploadImage!.readAsBytesSync(),
                                           _uploadImage!.path.split('.').last);
-                                  Food _food = Food(mealName: mealName, mess: messName,imageUrl: _imageUrl.isEmpty ? _oFood!.imageUrl : _imageUrl, price: mealPrice, day: _daysOfTheWeek[_dayIndex], mealType: _meals[_mealIndex], count:(_oFood==null)?0:_oFood!.count,rating: (_oFood==null)?0:_oFood!.rating);
+                                  Food _food = Food(mealName: mealName, mess: messName,imageUrl: _imageUrl.isEmpty ? _oFood!.imageUrl : _imageUrl, price: mealPrice, day: _daysOfTheWeek[_dayIndex], mealType: _meals[_mealIndex], count:(_oFood==null)?0:_oFood!.count,rating: (_oFood==null)?0:_oFood!.rating,prevCount: _oFood!.prevCount, prevRating: _oFood!.prevCount);
 
                                   Database.setFood(_food);
                                   
@@ -652,10 +719,10 @@ class _RepMenuState extends State<RepMenu> {
                                   height: 50,
                                   width: 150,
                                   color: LightTheme.deepIndigoAccent,
-                                  child: Center(
+                                  child: const Center(
                                     child: Text(
-                                      applyFilters ? 'Apply Filters' : 'Save Changes',
-                                      style:const TextStyle(
+                                      'Save Changes',
+                                      style: TextStyle(
                                         color: Colors.white,
                                       ),
                                     ),

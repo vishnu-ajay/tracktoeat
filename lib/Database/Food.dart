@@ -4,15 +4,20 @@ class Food {
   String mealType;
   String imageUrl;
   String mess;
+  int prevRating;
+  int prevCount;
   int rating;
   int count;
   double price;
+
   Food(
       {required this.day,
       required this.mealName,
       required this.mealType,
       required this.imageUrl,
       required this.mess,
+        required this.prevRating,
+        required this.prevCount,
       required this.rating,
       required this.price,
       required this.count});
@@ -25,7 +30,9 @@ class Food {
         imageUrl = json['imageUrl']??"",
         price = json['price']??0,
         count = json['count'] ?? 0,
-        rating = json['rating'] ?? 0;
+        rating = json['rating'] ?? 0,
+        prevRating = json['prevRating'] ?? 0,
+        prevCount = json['prevCount'] ?? 0;
 
   Map<String,dynamic> toJson()=>{
     'day':day,
@@ -35,6 +42,8 @@ class Food {
     'imageUrl':imageUrl,
     'price':price,
     'count':count,
-    'rating':rating
+    'rating':rating,
+    'prevRating':prevRating,
+    'prevCount':prevCount
   };
 }

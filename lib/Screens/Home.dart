@@ -47,16 +47,16 @@ class _HomeState extends State<Home> {
 
   List<Widget> getMenuBar(){
     if(userRole==messRep) {
-      return const [
-        HomeMenu(),
-        AllMenu(),
-        RepMenu(),
+      return [
+        HomeMenu(authUser: widget.authUser,),
+        AllMenu(authUser: widget.authUser,),
+        RepMenu(authUser: widget.authUser,),
       ];
     }
 
-    return const[
-      HomeMenu(),
-      AllMenu(),
+    return [
+      HomeMenu(authUser: widget.authUser,),
+      AllMenu(authUser: widget.authUser,),
     ];
   }
 

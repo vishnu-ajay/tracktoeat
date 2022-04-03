@@ -14,7 +14,7 @@ class Database{
   static final CollectionReference userCollection = FirebaseFirestore.instance.collection('Users');
   static final CollectionReference foodCollection = FirebaseFirestore.instance.collection('Food');
   static final CollectionReference messCollection = FirebaseFirestore.instance.collection('Mess');
-
+  static final CollectionReference messRepMappingCollection = FirebaseFirestore.instance.collection('MessRepMapping');
   static Future<bool> alreadyRegistered(String email)async{
     return ((await userCollection.where('email',isEqualTo: email).get()).docs.isNotEmpty);
   }
@@ -36,20 +36,19 @@ class Database{
     return User(email: result['email'], role: result['role']);
   }
   
-  static Future<Food> getFood(String mess, String mealType)async{
-    List<QueryDocumentSnapshot<Object?>> snapshotDocs = (await foodCollection.where('mess', isEqualTo: mess).where('mealType',isEqualTo: mealType).get()).docs;
+  static Future<Food> getFood(String mess,String day, String mealType)async{
+    List<QueryDocumentSnapshot<Object?>> snapshotDocs = (await foodCollection.where('day',isEqualTo: day).where('mess', isEqualTo: mess).where('mealType',isEqualTo: mealType).get()).docs;
     if(snapshotDocs.isEmpty){
       return Food.fromJson({});
     }
     var result = snapshotDocs.first.data() as Map<String, dynamic>;
-    print(result);
     return Food.fromJson(result);
   }
   
   static Future<void> setFood(Food data)async{
     Map<String,dynamic>food = data.toJson();
 
-    List<QueryDocumentSnapshot> _list = (await foodCollection.where('mess', isEqualTo: data.mealName).where('mealType',isEqualTo: data.mealName).get()).docs;
+    List<QueryDocumentSnapshot> _list = (await foodCollection.where('day',isEqualTo: data.day).where('mess', isEqualTo: data.mess).where('mealType',isEqualTo: data.mealType).get()).docs;
     if(_list.isNotEmpty){
       await foodCollection.doc(_list.first.id).update(food);
     }else{
@@ -59,13 +58,10 @@ class Database{
 
   static Future<String> uploadImage(Uint8List fileBytes, String fileType)async{
     try {
-      print(FirebaseStorage.instance.ref().child('images/${DateTime.now().microsecondsSinceEpoch}.$fileType').fullPath);
-      print('^'*50);
       TaskSnapshot snapshot = await FirebaseStorage.instance.ref().child('images/${DateTime.now().microsecondsSinceEpoch}.$fileType').putData(fileBytes);
       return snapshot.ref.getDownloadURL();
     }catch(e){
       print(e.toString());
-      print('*'*50);
     }
 
     return "-1";
@@ -96,5 +92,29 @@ class Database{
 
     return _list;
   }
+
+  static Future<List<Food>> getAllFood()async{
+    List<Food>_list = [];
+
+    List<QueryDocumentSnapshot>_snapshots = (await foodCollection.get()).docs;
+
+    for(var snapshot in _snapshots){
+      _list.add(Food.fromJson(snapshot.data() as Map<String,dynamic>));
+    }
+
+    return _list;
+  }
+
+  static Future<String> getMyMess(String email)async{
+    DocumentSnapshot documentSnapshot = (await messRepMappingCollection.doc(email).get());
+    if(documentSnapshot.data()==null){
+      return "";
+    }
+
+    Map<String,dynamic> result = documentSnapshot.data() as Map<String,dynamic>;
+
+    return result['mess']??"";
+  }
+
 
 }

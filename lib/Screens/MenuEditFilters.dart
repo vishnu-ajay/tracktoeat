@@ -17,8 +17,7 @@ class MenuEditFilters extends StatefulWidget {
 class _MenuEditFiltersState extends State<MenuEditFilters> {
   String dropdownValue = 'Tuesday';
   String meal = 'Snacks';
-  bool ratingLowToHigh = false;
-  bool costLowToHigh = true;
+  String filterVal = SearchFilter.ratingHighToLow;
   List<String> messList = [];
   List<bool> selectedMess = [];
   bool loading = true;
@@ -273,9 +272,9 @@ class _MenuEditFiltersState extends State<MenuEditFilters> {
                                         ),
                                         child: Row(
                                           children: [
-                                            Radio(value: false, groupValue: ratingLowToHigh, onChanged: (bool? value) {
+                                            Radio(value: SearchFilter.ratingHighToLow, groupValue:filterVal, onChanged: (String? value) {
                                               setState(() {
-                                                ratingLowToHigh = value ?? false;
+                                                filterVal = value??SearchFilter.ratingHighToLow;
                                               });
                                             },),
                                             const Text(
@@ -309,9 +308,9 @@ class _MenuEditFiltersState extends State<MenuEditFilters> {
                                         ),
                                         child: Row(
                                           children: [
-                                            Radio(value: true, groupValue: ratingLowToHigh, onChanged: (bool? value) {
+                                            Radio(value: SearchFilter.ratingLowToHigh, groupValue:filterVal, onChanged: (String? value) {
                                               setState(() {
-                                                ratingLowToHigh = value ?? false;
+                                                filterVal = value??SearchFilter.ratingHighToLow;
                                               });
                                             },),
                                             const Text(
@@ -376,9 +375,9 @@ class _MenuEditFiltersState extends State<MenuEditFilters> {
                                         ),
                                         child: Row(
                                           children: [
-                                            Radio(value: false, groupValue: costLowToHigh, onChanged: (bool? value) {
+                                            Radio(value: SearchFilter.costLowToHigh, groupValue:filterVal, onChanged: (String? value) {
                                               setState(() {
-                                                costLowToHigh = value??true;
+                                                filterVal = value??SearchFilter.ratingHighToLow;
                                               });
                                             },),
                                             const Text(
@@ -412,9 +411,9 @@ class _MenuEditFiltersState extends State<MenuEditFilters> {
                                         ),
                                         child: Row(
                                           children: [
-                                            Radio(value: true, groupValue: costLowToHigh, onChanged: (bool? value) {
+                                            Radio(value: SearchFilter.costHighToLow, groupValue:filterVal, onChanged: (String? value) {
                                               setState(() {
-                                                costLowToHigh = value ?? true;
+                                                filterVal = value??SearchFilter.ratingHighToLow;
                                               });
                                             },),
                                             const Text(
@@ -489,7 +488,7 @@ class _MenuEditFiltersState extends State<MenuEditFilters> {
                                 _messes.add(messList[i]);
                               }
                             }
-                            SearchFilter searchFilter = SearchFilter(meal: meal,mess: _messes, day: dropdownValue, ratingLowToHigh: ratingLowToHigh, costLowToHigh: costLowToHigh);
+                            SearchFilter searchFilter = SearchFilter(meal: meal,mess: _messes, day: dropdownValue, filter: filterVal);
                             Navigator.pop(context,searchFilter);
                             },
                           child: Container(
