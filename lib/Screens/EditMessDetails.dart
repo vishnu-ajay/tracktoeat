@@ -48,7 +48,7 @@ class _EditMessDetailsState extends State<EditMessDetails> {
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
       appBar: AppBar(
-        title: const Text('Track2Eat'),
+        title: Text('Edit ${widget.messName}'),
         backgroundColor: LightTheme.deepIndigoAccent,
         actions: [
           IconButton(
@@ -432,6 +432,16 @@ class _EditMessDetailsState extends State<EditMessDetails> {
                               loading = true;
                             });
 
+                            bool isSuperAdmin = await Database.isSuperAdmin(messDetails.messRepEmail);
+
+                            if(isSuperAdmin){
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Super Admin cannot be assigned as Mess Rep',style: TextStyle(color: LightTheme.white),)));
+                              setState(() {
+                                loading = false;
+                              });
+                              return;
+                            }
+
                             await Database.deleteMessDetails(originalDetails);
 
 
@@ -445,6 +455,8 @@ class _EditMessDetailsState extends State<EditMessDetails> {
                             setState(() {
                               loading = false;
                             });
+
+                            Navigator.pop(context);
 
                           },
                           child: Container(

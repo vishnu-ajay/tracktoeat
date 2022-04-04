@@ -11,6 +11,7 @@ import '../Database/Food.dart';
 import '../Database/LocalDB.dart';
 import '../Globals.dart';
 import '../Theme.dart';
+import 'MessDetailsView.dart';
 import 'Widgets/InteractiveStarRating.dart';
 
 class FoodView extends StatefulWidget {
@@ -94,12 +95,29 @@ class _FoodViewState extends State<FoodView> {
                   padding: const EdgeInsets.only(top: 20, bottom: 10),
                   sliver: SliverToBoxAdapter(
                     child: Center(
-                      child: Text(
-                        widget.food.mess,
-                        style: const TextStyle(
-                            color: LightTheme.darkGray,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(5)),
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context){
+                              return MessDetailsView(messName:widget.food.mess);
+                            }));
+                          },
+                          child: Container(
+                            width: 150,
+                            color: LightTheme.deepIndigoAccent,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text(
+                                widget.food.mess,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),

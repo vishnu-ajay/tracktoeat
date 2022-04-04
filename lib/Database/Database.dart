@@ -155,4 +155,31 @@ class Database{
     messCollection.doc('all-mess').update({'mess':FieldValue.arrayRemove([messDetails.nameOfMess])});
   }
 
+  static Future<bool> isSuperAdmin(String email)async{
+    try {
+      Map<String,dynamic>result = (await userCollection.where(
+          'email', isEqualTo: email).get()).docs.first.data() as Map<String,dynamic>;
+      return (result['role'] == superAdmin);
+    }catch(e){
+      return false;
+    }
+  }
+
+  static Future<bool> messAlreadyExists(String messName)async{
+    List<String> _list = await Database.getAllMess();
+
+    return _list.contains(messName);
+  }
+
+  static Future<bool> isMessRepOfOther(String email, String messName)async{
+    DocumentSnapshot snapshot = await messRepMappingCollection.doc(email).get();
+
+    if(!snapshot.exists){
+      return false;
+    }
+
+    return (snapshot.get('mess') != null && snapshot.get('mess') != messName);
+
+  }
+
 }

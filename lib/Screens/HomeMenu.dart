@@ -175,63 +175,81 @@ class _HomeMenuState extends State<HomeMenu> {
                               selectedMess = List.filled(messList.length, false);
                               loading = false;
                             });
+                            bool confirmChanges = false;
                             _searchFilter = SearchFilter(meal:(DateTime.now().hour >= 18) ? "Dinner" : "Snacks" , mess: [], day: DateFormat('EEEE').format(DateTime.now()), filter: SearchFilter.ratingHighToLow);
                             await showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    content: SizedBox(
-                                      height: 350,
-                                      width: 300,
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 300,
-                                            child: ListView(
-                                              children: List.generate(messList.length, (index) {
-                                                return CheckboxListTile(
-                                                    title: Text(messList[index]),
-                                                    value: selectedMess[index],
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        selectedMess[index] = value??false;
-                                                      });
+                                    content: StatefulBuilder(
+                                      builder:(BuildContext context, StateSetter setState){
+                                        return  SizedBox(
+                                          height: 350,
+                                          width: 300,
+                                          child: Column(
+                                            children: [
+                                              SizedBox(
+                                                height: 300,
+                                                child: ListView(
+                                                  children: List.generate(messList.length, (index) {
+                                                    return CheckboxListTile(
+                                                        title: Text(messList[index]),
+                                                        value: selectedMess[index],
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedMess[index] = value??false;
+                                                          });
+                                                        });
+                                                  }),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              ClipRRect(
+                                                borderRadius: const BorderRadius.all(
+                                                    Radius.circular(5)),
+                                                child: GestureDetector(
+                                                  onTap: (){
+
+                                                    setState(() {
+                                                      confirmChanges = true;
                                                     });
-                                              }),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          ClipRRect(
-                                            borderRadius: const BorderRadius.all(
-                                                Radius.circular(5)),
-                                            child: Container(
-                                              height: 40,
-                                              width: 150,
-                                              color: LightTheme.deepIndigoAccent,
-                                              child: const Center(
-                                                child: Text(
-                                                  'Confirm',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
+
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Container(
+                                                    height: 40,
+                                                    width: 150,
+                                                    color: LightTheme.deepIndigoAccent,
+                                                    child: const Center(
+                                                      child: Text(
+                                                        'Confirm',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        );
+                                      }
                                     ),
                                   );
                                 });
-                            _searchFilter.mess.clear();
-                            for(int i=0;i<selectedMess.length;i++){
-                              if(selectedMess[i]){
-                                _searchFilter.mess.add(messList[i]);
+
+                            if(confirmChanges) {
+                              _searchFilter.mess.clear();
+                              for (int i = 0; i < selectedMess.length; i++) {
+                                if (selectedMess[i]) {
+                                  _searchFilter.mess.add(messList[i]);
+                                }
                               }
+                              applySearchFilters(_searchFilter);
                             }
-                            applySearchFilters(_searchFilter);
                           },
                           icon: const Icon(Icons.more_vert),
                         ),
@@ -258,6 +276,22 @@ class _HomeMenuState extends State<HomeMenu> {
                 ),
               ),
             ),
+
+            if(_list.isEmpty)
+              const SliverPadding(padding: EdgeInsets.symmetric(vertical: 40,horizontal: 20),
+              sliver: SliverToBoxAdapter(
+                child: Center(
+                  child:Text(
+                    'Nothing to show!',
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: LightTheme.deepIndigoAccent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  )
+                ),
+              ),),
+
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               sliver: SliverList(

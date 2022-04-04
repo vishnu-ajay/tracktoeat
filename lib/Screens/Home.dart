@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -31,6 +33,8 @@ class _HomeState extends State<Home> {
   int selectedPage = 0;
   String userRole = primaryUser;
   bool loading = true;
+  int backPressCount = 0;
+  Timer? timer;
 
   @override
   void initState(){
@@ -39,6 +43,7 @@ class _HomeState extends State<Home> {
       widget.authUser.role = value;
       userRole = value;
       setState(() {
+        backPressCount = 0;
         loading = false;
       });
     });
@@ -70,71 +75,93 @@ class _HomeState extends State<Home> {
       return const SuperAdminHome();
     }
 
-    return SafeArea(child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Track2Eat'),
-        backgroundColor: LightTheme.deepIndigoAccent,
-        actions: [
-          IconButton(
-            onPressed: () {
-              AuthService().logout();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){return const Wrapper();}));
-            },
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
+    return WillPopScope(
+      onWillPop: () async {
+        if(backPressCount == 1){
+          backPressCount = 0;
+          if(timer!=null && timer!.isActive){
+            timer!.cancel();
+          }
+          return true;
+        }
+        backPressCount++;
+        timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+          if(mounted) {
+            setState(() {
+              backPressCount = 0;
+            });
+          }
+          timer.cancel();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: LightTheme.deepIndigoAccent,content: Text('Press Again to Exit!',style: TextStyle(color: LightTheme.white),)));
+        return false;
+      },
+      child: SafeArea(child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Track2Eat'),
+          backgroundColor: LightTheme.deepIndigoAccent,
+          actions: [
+            IconButton(
+              onPressed: () {
+                AuthService().logout();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){return const Wrapper();}));
+              },
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
             ),
-          ),
-        ],
-      ),
-        body: PageView(
-          scrollDirection: Axis.horizontal,
-          controller: _pageController,
-          children: getMenuBar(),
+          ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.home),
-                color: selectedPage == 0 ? LightTheme.deepIndigoAccent : Colors
-                    .grey,
-                onPressed: () {
-                  _pageController.animateToPage(0, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
-                  setState(() {
-                    selectedPage = 0;
-                  });
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.menu),
-                color: selectedPage == 1 ? LightTheme.deepIndigoAccent : Colors
-                    .grey,
-                onPressed: () {
-                  _pageController.animateToPage(1, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
-                  setState(() {
-                    selectedPage = 1;
-                  });
-                },
-              ),
-
-              if(userRole == messRep)
+          body: PageView(
+            scrollDirection: Axis.horizontal,
+            controller: _pageController,
+            children: getMenuBar(),
+          ),
+          bottomNavigationBar: BottomAppBar(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
                 IconButton(
-                  icon: const Icon(Icons.more_horiz),
-                  color: selectedPage == 2 ? LightTheme.deepIndigoAccent : Colors
+                  icon: const Icon(Icons.home),
+                  color: selectedPage == 0 ? LightTheme.deepIndigoAccent : Colors
                       .grey,
                   onPressed: () {
-                    _pageController.animateToPage(2, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
+                    _pageController.animateToPage(0, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
                     setState(() {
-                      selectedPage = 2;
+                      selectedPage = 0;
                     });
                   },
                 ),
-            ],
-          ),
-        )
-    ),
+                IconButton(
+                  icon: const Icon(Icons.menu),
+                  color: selectedPage == 1 ? LightTheme.deepIndigoAccent : Colors
+                      .grey,
+                  onPressed: () {
+                    _pageController.animateToPage(1, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
+                    setState(() {
+                      selectedPage = 1;
+                    });
+                  },
+                ),
+
+                if(userRole == messRep)
+                  IconButton(
+                    icon: const Icon(Icons.more_horiz),
+                    color: selectedPage == 2 ? LightTheme.deepIndigoAccent : Colors
+                        .grey,
+                    onPressed: () {
+                      _pageController.animateToPage(2, curve: Curves.easeIn, duration: const Duration(milliseconds: 500));
+                      setState(() {
+                        selectedPage = 2;
+                      });
+                    },
+                  ),
+              ],
+            ),
+          )
+      ),
+      ),
     );
   }
 }

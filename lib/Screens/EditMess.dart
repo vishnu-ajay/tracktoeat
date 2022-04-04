@@ -34,19 +34,8 @@ class _EditMessState extends State<EditMess> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              title: const Text('Track2Eat'),
+              title: const Text('Edit Mess'),
               backgroundColor: LightTheme.deepIndigoAccent,
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    AuthService().logout();
-                  },
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
             ),
             body: Stack(
               children: [

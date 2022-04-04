@@ -31,19 +31,8 @@ class _ViewMessRepState extends State<ViewMessRep> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Track2Eat'),
+          title: const Text('View Mess Rep'),
           backgroundColor: LightTheme.deepIndigoAccent,
-          actions: [
-            IconButton(
-              onPressed: () {
-                AuthService().logout();
-              },
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
-            ),
-          ],
         ),
         body: _list.isEmpty
             ? const Center(
@@ -56,9 +45,17 @@ class _ViewMessRepState extends State<ViewMessRep> {
                 children: List.generate(
                   _list.length,
                   (index) {
-                    return ListTile(
-                      title: Text(_list[index].email),
-                      subtitle: Text(_list[index].role),
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        elevation: 10,
+                        child: ListTile(
+                          tileColor: LightTheme.deepIndigoAccent,
+                          textColor: Colors.white,
+                          title: Text(_list[index].email),
+                          subtitle: Text(_list[index].role),
+                        ),
+                      ),
                     );
                   },
                 ),

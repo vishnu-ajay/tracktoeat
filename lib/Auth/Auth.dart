@@ -63,8 +63,6 @@ class AuthService{
       }
       return AuthUser(user:_user,role:role,error:"");
     }catch(e){
-      print(e.toString());
-      print('___'*30);
       return AuthUser(user:null,role:"",error:e.toString());
     }
   }

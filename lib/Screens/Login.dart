@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -28,6 +29,8 @@ class _LoginState extends State<Login> {
   bool showLoading = false;
   String error = "";
   final AuthService _auth = AuthService();
+  int backPressCount = 0;
+  Timer? timer;
 
   @override
   void initState() {
@@ -42,12 +45,46 @@ class _LoginState extends State<Login> {
     return loading
         ? WillPopScope(
         onWillPop: () async {
+          if(backPressCount == 1){
+            backPressCount = 0;
+            if(timer!=null && timer!.isActive){
+              timer!.cancel();
+            }
+            return true;
+          }
+          backPressCount++;
+          timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+            if(mounted) {
+              setState(() {
+                backPressCount = 0;
+              });
+            }
+            timer.cancel();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: LightTheme.deepIndigoAccent,content: Text('Press Again to Exit!',style: TextStyle(color: LightTheme.white),)));
           return false;
         },
         child: Scaffold(key: scaffoldKey, body: Loading()))
         : SafeArea(
       child: WillPopScope(
         onWillPop: () async {
+          if(backPressCount == 1){
+            backPressCount = 0;
+            if(timer!=null && timer!.isActive){
+              timer!.cancel();
+            }
+            return true;
+          }
+          backPressCount++;
+          timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+            if(mounted) {
+              setState(() {
+                backPressCount = 0;
+              });
+            }
+            timer.cancel();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: LightTheme.deepIndigoAccent,content: Text('Press Again to Exit!',style: TextStyle(color: LightTheme.white),)));
           return false;
         },
         child: Scaffold(

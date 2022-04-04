@@ -28,19 +28,8 @@ class _AddMessState extends State<AddMess> {
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
       appBar: AppBar(
-        title: const Text('Track2Eat'),
+        title: const Text('Add Mess'),
         backgroundColor: LightTheme.deepIndigoAccent,
-        actions: [
-          IconButton(
-            onPressed: () {
-              AuthService().logout();
-            },
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-          ),
-        ],
       ),
       body: Form(
         key: _formKey,
@@ -403,6 +392,36 @@ class _AddMessState extends State<AddMess> {
                             loading = true;
                           });
 
+                          bool messExists = await Database.messAlreadyExists(nameOfMess);
+
+                          if(messExists){
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Mess Already Exists!',style: TextStyle(color: LightTheme.white),)));
+                            setState(() {
+                              loading = false;
+                            });
+                            return;
+                          }
+
+                          bool isMessRepOfOther = await Database.isMessRepOfOther(messRepEmail, nameOfMess);
+
+                          if(isMessRepOfOther){
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Is already a Mess Rep of another mess!',style: TextStyle(color: LightTheme.white),)));
+                            setState(() {
+                              loading = false;
+                            });
+                            return;
+                          }
+
+                          bool isSuperAdmin = await Database.isSuperAdmin(messRepEmail);
+
+                          if(isSuperAdmin){
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.deepOrange,content: Text('Super Admin cannot be assigned as Mess Rep',style: TextStyle(color: LightTheme.white),)));
+                            setState(() {
+                              loading = false;
+                            });
+                            return;
+                          }
+
 
                           await Database.addMess(MessDetails(nameOfMess: nameOfMess, messRepEmail: messRepEmail, messRepName: messRepName, messLocation: messLocation, managerPhoneNo: managerPhoneNo)).then((value){
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: LightTheme.deepIndigoAccent,content: Text('Added mess successfully!',style: TextStyle(color: LightTheme.white),)));
@@ -414,6 +433,8 @@ class _AddMessState extends State<AddMess> {
                           setState(() {
                             loading = false;
                           });
+
+                          Navigator.pop(context);
 
                           },
                         child: Container(
