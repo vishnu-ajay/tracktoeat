@@ -76,6 +76,87 @@ class _EditMessState extends State<EditMess> {
                                     color: Colors.white,
                                     child: IconButton(
                                         onPressed: ()async{
+
+                                          bool result = await showDialog(
+                                            barrierDismissible: false,
+                                              context: context, builder: (BuildContext context){
+                                            return AlertDialog(
+                                              content: SizedBox(
+                                                height: 200,
+                                                width: 200,
+                                                child: Column(
+                                                  children: [
+                                                    const Spacer(),
+                                                    const Text(
+                                                      'Are you sure you want to delete?',
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                    const Spacer(flex: 2,),
+                                                    Row(
+                                                      children: [
+                                                        const Spacer(),
+                                                        ClipRRect(
+                                                          borderRadius: const BorderRadius.all(
+                                                              Radius.circular(5)),
+                                                          child: GestureDetector(
+                                                            onTap: (){
+                                                              Navigator.pop(context,false);
+                                                            },
+                                                            child: Container(
+                                                              height: 40,
+                                                              width: 80,
+                                                              color: Colors.deepOrange,
+                                                              child: const Center(
+                                                                child: Text(
+                                                                  'Discard',
+                                                                  style: TextStyle(
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const Spacer(),
+                                                        ClipRRect(
+                                                          borderRadius: const BorderRadius.all(
+                                                              Radius.circular(5)),
+                                                          child: GestureDetector(
+                                                            onTap: (){
+                                                              Navigator.pop(context,true);
+                                                            },
+                                                            child: Container(
+                                                              height: 40,
+                                                              width: 80,
+                                                              color: LightTheme.deepIndigoAccent,
+                                                              child: const Center(
+                                                                child: Text(
+                                                                  'Confirm',
+                                                                  style: TextStyle(
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const Spacer(),
+                                                      ],
+                                                    ),
+                                                    const Spacer(),
+
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          });
+
+                                          if(!result){
+                                            return;
+                                          }
+
                                           setState(() {
                                             loading = true;
                                           });

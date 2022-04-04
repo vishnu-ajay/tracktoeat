@@ -140,10 +140,14 @@ class _LoginState extends State<Login> {
                           setState(() {
                             showLoading = true;
                           });
+
                           AuthUser res = await _auth.loginWithGoogle();
-                          setState(() {
-                            showLoading  = false;
-                          });
+
+                          if(mounted) {
+                            setState(() {
+                              showLoading = false;
+                            });
+                          }
                         },
                         child: Container(
                             width: 200,

@@ -33,20 +33,28 @@ class _HomeState extends State<Home> {
   int selectedPage = 0;
   String userRole = primaryUser;
   bool loading = true;
+  bool invalidEmail = false;
   int backPressCount = 0;
   Timer? timer;
 
   @override
   void initState(){
     firebaseAuth.User? user = widget.authUser.user;
-    Database.getUserRole(user == null ? "" : (user.email??"")).then((value){
-      widget.authUser.role = value;
-      userRole = value;
+    if((user == null) || (!user.email!.endsWith('nitc.ac.in'))){
       setState(() {
-        backPressCount = 0;
+        invalidEmail = true;
         loading = false;
       });
-    });
+    }else {
+      Database.getUserRole(user.email ?? "").then((value) {
+        widget.authUser.role = value;
+        userRole = value;
+        setState(() {
+          backPressCount = 0;
+          loading = false;
+        });
+      });
+    }
     super.initState();
   }
 
@@ -69,6 +77,25 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     if(loading) {
       return Loading();
+    }
+
+    if(invalidEmail){
+      Future.delayed(const Duration(seconds: 3)).then((value){
+        AuthService().logout();
+      });
+      return SafeArea(child: Scaffold(
+        body: Column(
+          children: [
+            const Spacer(),
+            Container(
+              height: 60,
+              width: double.infinity,
+              color: Colors.deepOrange,
+              child: const Center(child: Text('Only NITC domain allowed!',style: TextStyle(color: Colors.white),)),
+            ),
+          ],
+        )
+      ),);
     }
 
     if(userRole==superAdmin){
